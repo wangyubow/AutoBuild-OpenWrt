@@ -81,8 +81,8 @@ jobs:
       run: |
         git clone https://github.com/xiaorouji/openwrt-passwall.git package/lienol
         git clone https://github.com/xiaorouji/openwrt-passwall.git package/xiaorouji_passwall
-        git clone https://github.com/pymumu/smartdns.git package/pymumu_smartdns
-        git clone 
+        git clone https://github.com/pymumu/smartdns.git package/Original_smartdns
+        git clone https://github.com/AdguardTeam/AdGuardHome.git package/Original_AdGuardHome
     #    git clone "your_github_link" package/"your_folder_name"      
 
     - name: Import external feeds - JerryKuKu Argon
