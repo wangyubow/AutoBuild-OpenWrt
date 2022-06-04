@@ -71,6 +71,7 @@ jobs:
       working-directory: ./openwrt
       run: |
         sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
+        sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' ./feeds.conf.default
         ./scripts/feeds update -a
         ./scripts/feeds install -a
        
@@ -79,12 +80,15 @@ jobs:
       working-directory: ./openwrt
       run: |
         git clone https://github.com/xiaorouji/openwrt-passwall.git package/lienol
+        git clone https://github.com/xiaorouji/openwrt-passwall.git package/xiaorouji_passwall
+        git clone https://github.com/pymumu/smartdns.git package/pymumu_smartdns
+        git clone 
     #    git clone "your_github_link" package/"your_folder_name"      
 
     - name: Import external feeds - JerryKuKu Argon
       working-directory: ./openwrt
       run: |
-    #    git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon-jerrykuku
+        git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon-jerrykuku
 
     - name: Configuration Customization - Build_Nanopi_R4S
       env:
