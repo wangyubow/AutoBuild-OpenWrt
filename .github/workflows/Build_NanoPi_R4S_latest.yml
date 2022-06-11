@@ -23,7 +23,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout
@@ -54,7 +54,12 @@ jobs:
           mysql* \
           php*
         sudo -E apt-get update
-        sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf wget curl swig rsync
+        sudo -E apt-get install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+            bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
+            git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
+            libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \
+            mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip qemu-utils \
+            rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
         sudo -E apt-get -y autoremove --purge
         sudo -E apt-get clean
 
@@ -65,30 +70,51 @@ jobs:
       run: |
         git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
         cd openwrt
-        echo "src-git ssrp https://github.com/fw876/helloworld.git" >> ./feeds.conf.default
+        git pull
+
+        echo "src-git helloworld https://github.com/fw876/helloworld.git" >> ./feeds.conf.default
         
     - name: Update & Install feeds
       working-directory: ./openwrt
       run: |
-        sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
-        sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' ./feeds.conf.default
+        #  sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
+        sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages.git' ./feeds.conf.default
+        sed -i '$a src-git xiaoruoji_passwall https://github.com/xiaorouji/openwrt-passwall.git' ./feeds.conf.default
+
         ./scripts/feeds update -a
         ./scripts/feeds install -a
-       
+        ./scripts/feeds install -a
 
-    - name: Import external feeds - passwall
+    - name: Import external feeds - oh-my-zsh, passwall
       working-directory: ./openwrt
       run: |
-        git clone https://github.com/xiaorouji/openwrt-passwall.git package/lienol
-        git clone https://github.com/xiaorouji/openwrt-passwall.git package/xiaorouji_passwall
-        git clone https://github.com/pymumu/smartdns.git package/Original_smartdns
-        git clone https://github.com/AdguardTeam/AdGuardHome.git package/Original_AdGuardHome
-    #    git clone "your_github_link" package/"your_folder_name"      
+        #    git clone https://github.com/xiaorouji/openwrt-passwall.git package/lienol
+        #    git clone https://github.com/pymumu/smartdns.git package/Original_smartdns
+        #    git clone "your_github_link" package/"your_folder_name" 
+
+        ## Install oh-my-zsh
+        # Clone oh-my-zsh repository
+        git clone https://github.com/robbyrussell/oh-my-zsh ./.oh-my-zsh
+
+        # Install extra plugins
+        git clone https://github.com/zsh-users/zsh-autosuggestions ./.oh-my-zsh/custom/plugins/zsh-autosuggestions
+        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ./.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+        git clone https://github.com/zsh-users/zsh-completions ./.oh-my-zsh/custom/plugins/zsh-completions
+
+        # Get .zshrc dotfile
+        ####cp $GITHUB_WORKSPACE/data/zsh/.zshrc .     
+        curl -L https://raw.githubusercontent.com/SuLingGG/OpenWrt-Rpi/main/data/zsh/.zshrc > ./.zshrc
+ 
+
 
     - name: Import external feeds - JerryKuKu Argon
       working-directory: ./openwrt
       run: |
         git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon-jerrykuku
+        
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        ./scripts/feeds install -a
 
     - name: Configuration Customization - Build_Nanopi_R4S
       env:
